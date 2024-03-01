@@ -1,0 +1,31 @@
+version: '3.8'
+services:
+  scrapyard:
+    build: ./scrapyard
+    ports:
+      - "8080:8080"
+    depends_on:
+      scrapyard-config-server:
+        condition: service_started
+      scrapyard-service-discovery:
+        condition: service_started
+    environment:
+      server.port: 8080
+      CONFIG-URL: scrapyard-config-server
+      config.port: 8888
+      SERVICE-DISCOVERY-URL: scrapyard-service-discovery
+      service-discovery.port: 8761
+
+  scrapyard-config-server:
+    build: ./scrapyard-config-server
+    ports:
+      - "8888:8888"
+    environment:
+      server.port: 8888
+
+  scrapyard-service-discovery:
+    build: ./scrapyard-service-discovery
+    ports:
+      - "8761:8761"
+    environment:
+      server.port: 8761

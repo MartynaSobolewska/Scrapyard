@@ -1,1 +1,0 @@
-INSERT INTO roles (id, name) VALUES ('ADMIN'), ('06aebeaf-0860-4943-bbf0-96b1bbabb7a1','USER');
