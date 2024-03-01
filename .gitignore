@@ -1,5 +1,6 @@
 .env
 target/
+scrapyard-config-server/target
 !**/src/main/**/target/
 !**/src/test/**/target/
 
