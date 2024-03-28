@@ -21,11 +21,11 @@ public class CommandLineAppStartupRunner implements CommandLineRunner {
     final RoleRepository roleRepository;
     final PasswordEncoder passwordEncoder;
 
-    @Value(value = "${accounts.admin.login}")
+    @Value(value = "${accounts.admin.login:testadmin}")
     String adminLogin;
     String adminRoleName = "ADMIN";
 
-    @Value(value = "${accounts.admin.password}")
+    @Value(value = "${accounts.admin.password:testadminsecret}")
     String adminPassword;
     String userRoleName = "USER";
 

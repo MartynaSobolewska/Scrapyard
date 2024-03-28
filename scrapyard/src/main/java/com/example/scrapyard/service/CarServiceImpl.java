@@ -1,7 +1,7 @@
 package com.example.scrapyard.service;
 
-import com.example.scrapyard.api.exceptions.AuthenticationException;
 import com.example.scrapyard.api.exceptions.BrandNotFoundException;
+import com.example.scrapyard.api.exceptions.CustomAuthException;
 import com.example.scrapyard.auth.JwtGenerator;
 import com.example.scrapyard.domain.CarDTO;
 import com.example.scrapyard.model.Brand;
@@ -35,17 +35,17 @@ public class CarServiceImpl implements CarService{
     }
 
     @Override
-    public Car saveCar(CarDTO car, String authToken) throws AuthenticationException, BrandNotFoundException {
+    public Car saveCar(CarDTO car, String authToken) throws CustomAuthException, BrandNotFoundException {
         if (brandRepository.findByName(car.getBrand()).isPresent()){
             if (!authToken.startsWith("Bearer ")){
-                throw AuthenticationException.createWith("Invalid token format.");
+                throw CustomAuthException.createWith("Invalid token format.");
             }
             String username = jwtGenerator.getUsernameFromJwt(authToken.split(" ")[1]);
             if (username == null){
-                throw AuthenticationException.createWith("Invalid token format.");
+                throw CustomAuthException.createWith("Invalid token format.");
             }
             if (userRepository.findByUsername(username).isEmpty()){
-                throw AuthenticationException.createWith("Incorrect user information.");
+                throw CustomAuthException.createWith("Incorrect user information.");
             }
             UserEntity user = userRepository.findByUsername(username).get();
             Brand brand = brandRepository.findByName(car.getBrand()).get();

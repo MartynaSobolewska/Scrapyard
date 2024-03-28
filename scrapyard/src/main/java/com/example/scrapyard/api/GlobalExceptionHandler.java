@@ -1,11 +1,14 @@
 package com.example.scrapyard.api;
 
 import com.example.scrapyard.api.exceptions.*;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.Nullable;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.ServletRequestBindingException;
@@ -16,14 +19,15 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 import org.springframework.web.util.WebUtils;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @ControllerAdvice
+@Order(Ordered.HIGHEST_PRECEDENCE)
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler({
             CarNotFoundException.class,
             AuthenticationException.class,
+            CustomAuthException.class,
             UsernameExistsException.class,
             DatabaseException.class,
             BrandNotFoundException.class,
@@ -48,6 +52,9 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         }else if (ex instanceof AuthenticationException authe){
             HttpStatus status = HttpStatus.FORBIDDEN;
             return handleRegularException(authe, headers, status, request);
+        }else if (ex instanceof CustomAuthException cauthe){
+            HttpStatus status = HttpStatus.FORBIDDEN;
+            return handleRegularException(cauthe, headers, status, request);
         }else if (ex instanceof DatabaseException dbe){
             HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
             return handleRegularException(dbe, headers, status, request);
@@ -57,7 +64,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         }
     }
 
-//    @Order(Ordered.HIGHEST_PRECEDENCE)
+    @Order(Ordered.HIGHEST_PRECEDENCE)
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex,
                                                                   HttpHeaders headers,
