@@ -27,13 +27,17 @@ public class JwtGenerator {
                 .signWith(SignatureAlgorithm.HS512, SecurityConstants.JWT_SECRET)
                 .compact();
     }
-
     public String createTestToken(String username){
+        return createTestToken(username, false);
+    }
+
+    public String createTestToken(String username, boolean forAdmin){
         Date currentDate = new Date();
         Date expireDate = new Date(currentDate.getTime() + SecurityConstants.JWT_EXPIRATION);
-        String[] authorities = new String[2];
+        String[] authorities = forAdmin ? new String[2] : new String[1];
         authorities[0] = new SimpleGrantedAuthority("USER").toString();
-        authorities[1] = new SimpleGrantedAuthority("ADMIN").toString();
+        if (forAdmin)
+            authorities[1] = new SimpleGrantedAuthority("ADMIN").toString();
 
         return Jwts.builder()
                 .setSubject(username)
