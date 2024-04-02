@@ -15,7 +15,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import java.util.UUID;
 
@@ -25,6 +27,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
+@TestPropertySource(locations = "classpath:application-test.properties")
 @AutoConfigureMockMvc
 class CarControllerTest {
 
@@ -95,6 +98,8 @@ class CarControllerTest {
         given(service.saveCar(any(CarDTO.class), any(String.class))).willReturn(goodCar);
         System.out.println(gson.toJson(goodCarDTO));
 
+        // response we expect - the same as from global exception handler's would be despite it being handled in a filter
+
         // When and Then
         mockMvc.perform(post("/car")
                         .header("Authorization", "Bearer "  + invalidToken)
@@ -103,6 +108,7 @@ class CarControllerTest {
                         .content(gson.toJson(goodCarDTO))
                         .characterEncoding("utf-8")
                 )
-                .andExpect(status().isUnauthorized());
+                .andExpect(status().isUnauthorized())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.errors.[0]").value("Authentication unsuccessful: incorrect token"));
     }
 }

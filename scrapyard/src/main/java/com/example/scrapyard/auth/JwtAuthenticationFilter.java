@@ -1,6 +1,6 @@
 package com.example.scrapyard.auth;
 
-import com.example.scrapyard.api.GlobalExceptionHandler;
+import com.example.scrapyard.api.exceptions.ApiError;
 import com.example.scrapyard.api.exceptions.CustomAuthException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -10,7 +10,6 @@ import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -19,14 +18,17 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.util.StringUtils;
-import org.springframework.web.ErrorResponse;
 import org.springframework.web.filter.OncePerRequestFilter;
+import com.google.gson.Gson;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 
 @NoArgsConstructor(force = true)
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
+
+    private Gson gson = new Gson();
 
     @Autowired
     private final JwtGenerator jwtGenerator;
@@ -49,15 +51,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 SecurityContextHolder.getContext().setAuthentication(authenticationToken);
             }
         } catch (CustomAuthException e) {
-            ErrorResponse errorResponse =
-                    ErrorResponse.create(e, HttpStatus.UNAUTHORIZED, "detail");
-            ResponseEntity<ErrorResponse> errorResponseEntity = new ResponseEntity<>(
-                    errorResponse, errorResponse.getStatusCode()
+            String responseBody = gson.toJson(
+                    new ApiError(Collections.singletonList("Authentication unsuccessful: incorrect token"))
             );
 
-            response.setStatus(errorResponse.getStatusCode().value());
+            response.setStatus(HttpStatus.UNAUTHORIZED.value());
             response.setContentType("application/json");
-            response.getWriter().write("{\"test\" : \"test value\"}");
+            response.getWriter().write(responseBody);
             return;
         }
         filterChain.doFilter(request, response);
