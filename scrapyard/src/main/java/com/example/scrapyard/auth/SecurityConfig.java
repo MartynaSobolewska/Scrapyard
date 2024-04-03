@@ -4,7 +4,6 @@ package com.example.scrapyard.auth;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -37,6 +36,7 @@ public class SecurityConfig {
                         .requestMatchers(antMatcher("/swagger-ui/**")).permitAll()
                         .requestMatchers(antMatcher("/api-docs/**")).permitAll()
                         .requestMatchers(antMatcher("/autoconfig/**")).permitAll()
+                        .requestMatchers((antMatcher(HttpMethod.GET, "/car/sum"))).hasAnyAuthority("ADMIN")
                         .requestMatchers((antMatcher(HttpMethod.GET,"/car/**"))).hasAnyAuthority("USER")
                         .requestMatchers((antMatcher(HttpMethod.POST,"/car/**"))).hasAnyAuthority("USER")
                         .requestMatchers((antMatcher(HttpMethod.PUT,"/car/**"))).hasAnyAuthority("USER")
