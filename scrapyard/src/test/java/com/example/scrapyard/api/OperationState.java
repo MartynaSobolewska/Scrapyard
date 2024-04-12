@@ -1,6 +1,6 @@
 package com.example.scrapyard.api;
 
-public enum GetState {
+public enum OperationState {
     NOT_FOUND,
     INVALID,
     FOUND

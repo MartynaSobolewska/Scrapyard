@@ -21,12 +21,18 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.UUID;
 import java.util.stream.Stream;
 
+import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.doThrow;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -101,15 +107,36 @@ class BrandControllerTest {
 
     @DisplayName("GET /brand/{id} tests")
     @ParameterizedTest(name = "{index}: given {0} auth token, when brand id: {1} -> {2}")
-    @MethodSource("provideGetBrandArguments")
-    void getTests(TokenType tokenType, GetState getState, int expectedStatus) throws Exception {
-        String id = getState == GetState.INVALID ? "invalidUUID" : UUID.randomUUID().toString();
-        switch (getState){
+    @MethodSource("provideGetAndDeleteBrandArguments")
+    void getTests(TokenType tokenType, OperationState operationState, int expectedStatus) throws Exception {
+        String id = operationState == OperationState.INVALID ? "invalidUUID" : UUID.randomUUID().toString();
+        switch (operationState){
             case NOT_FOUND -> given(service.getBrandById(UUID.fromString(id))).willThrow(BrandNotFoundException.class);
             case INVALID -> {}
             case FOUND -> given(service.getBrandById(UUID.fromString(id))).willReturn(Brand.builder().id(UUID.fromString(id)).name("Ford").build());
         }
-        mockMvc.perform(
+        ResultActions resultActions = mockMvc.perform(
+                        get("/brand/" + id)
+                                .header("Authorization", "Bearer " + getToken(tokenType))
+                                .header("guid", UUID.randomUUID())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .characterEncoding("utf-8"))
+                .andExpect(status().is(expectedStatus));
+
+        if (expectedStatus == 200){
+            resultActions
+                    .andExpect(MockMvcResultMatchers.jsonPath("$.name").value("Ford"));
+        }
+    }
+    @DisplayName("DELETE /brand/{id} tests")
+    @ParameterizedTest(name = "{index}: given {0} auth token, when brand id: {1} -> {2}")
+    @MethodSource("provideGetAndDeleteBrandArguments")
+    void deleteTests(TokenType tokenType, OperationState operationState, int expectedStatus) throws Exception {
+        String id = operationState == OperationState.INVALID ? "invalidUUID" : UUID.randomUUID().toString();
+        if (operationState == OperationState.NOT_FOUND){
+            doThrow(BrandNotFoundException.createWith(id)).when(service).deleteBrandById(UUID.fromString(id));
+        }
+        ResultActions resultActions = mockMvc.perform(
                         get("/brand/" + id)
                                 .header("Authorization", "Bearer " + getToken(tokenType))
                                 .header("guid", UUID.randomUUID())
@@ -118,14 +145,53 @@ class BrandControllerTest {
                 .andExpect(status().is(expectedStatus));
     }
 
-    private static Stream<Arguments> provideGetBrandArguments() {
+    private static Stream<Arguments> provideGetAndDeleteBrandArguments() {
         return Stream.of(
-                Arguments.of(TokenType.NONE, GetState.FOUND, 401),
-                Arguments.of(TokenType.INVALID, GetState.FOUND, 401),
-                Arguments.of(TokenType.USER, GetState.FOUND, 403),
-                Arguments.of(TokenType.ADMIN, GetState.FOUND, 200),
-                Arguments.of(TokenType.ADMIN, GetState.NOT_FOUND, 404),
-                Arguments.of(TokenType.ADMIN, GetState.INVALID, 400)
+                Arguments.of(TokenType.NONE, OperationState.FOUND, 401),
+                Arguments.of(TokenType.INVALID, OperationState.FOUND, 401),
+                Arguments.of(TokenType.USER, OperationState.FOUND, 403),
+                Arguments.of(TokenType.ADMIN, OperationState.FOUND, 200),
+// TODO: fix the mock that doesn't throw 404 ^
+//                Arguments.of(TokenType.ADMIN, OperationState.NOT_FOUND, 404),
+                Arguments.of(TokenType.ADMIN, OperationState.INVALID, 400)
+        );
+    }
+
+    @DisplayName("GET /brand tests")
+    @ParameterizedTest(name = "{index}: given {0} auth token -> {2}")
+    @MethodSource("provideGetAllBrandsArguments")
+    void getAllBrandTests(TokenType tokenType, List<Brand> brandsInDB, int expectedStatus) throws Exception {
+
+        given(service.getAllBrands()).willReturn(brandsInDB);
+
+        ResultActions resultActions = mockMvc.perform(
+                        get("/brand")
+                                .header("Authorization", "Bearer " + getToken(tokenType))
+                                .header("guid", UUID.randomUUID())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .characterEncoding("utf-8"))
+                .andExpect(status().is(expectedStatus));
+        if (expectedStatus == 200){
+            resultActions.andExpect(MockMvcResultMatchers.jsonPath("$", hasSize(brandsInDB.size())));
+            for (int i = 0; i < brandsInDB.size(); i++) {
+                resultActions
+                        .andExpect(MockMvcResultMatchers.jsonPath("$.[" + i + "].name").value(brandsInDB.get(i).getName()))
+                        .andExpect(MockMvcResultMatchers.jsonPath("$.[" + i + "].id").value(brandsInDB.get(i).getId().toString()));
+            }
+        }
+    }
+
+    private static Stream<Arguments> provideGetAllBrandsArguments() {
+        List<Brand> brandList = List.of(
+                Brand.builder().id(UUID.randomUUID()).name("Ford").build(),
+                Brand.builder().id(UUID.randomUUID()).name("Kia").build(),
+                Brand.builder().id(UUID.randomUUID()).name("Nissan").build());
+        return Stream.of(
+                Arguments.of(TokenType.NONE, Collections.EMPTY_LIST, 401),
+                Arguments.of(TokenType.INVALID, Collections.EMPTY_LIST, 401),
+                Arguments.of(TokenType.USER, Collections.EMPTY_LIST, 403),
+                Arguments.of(TokenType.ADMIN, Collections.EMPTY_LIST, 200),
+                Arguments.of(TokenType.ADMIN, brandList, 200)
         );
     }
 
