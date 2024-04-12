@@ -25,6 +25,7 @@ import java.util.*;
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler({
+            Exception.class,
             CarNotFoundException.class,
             AuthenticationException.class,
             CustomAuthException.class,
