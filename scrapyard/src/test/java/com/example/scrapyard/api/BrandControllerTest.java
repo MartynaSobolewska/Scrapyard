@@ -46,8 +46,6 @@ class BrandControllerTest {
     @MockBean
     private BrandService service;
 
-    private String invalidToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6ImludmFsaWQgand0IHRva2VuIiwiaWF0IjoxNTE2MjM5MDIyfQ.EbNcDTfTgPJn5LsfLUlba_Tdzmhmd4L4b0tmqUnH3BM";
-
     @BeforeEach
     void setUp() {
         gson = new Gson();
@@ -132,6 +130,7 @@ class BrandControllerTest {
     }
 
     private String getToken(TokenType tokenType) {
+        final String invalidToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6ImludmFsaWQgand0IHRva2VuIiwiaWF0IjoxNTE2MjM5MDIyfQ.EbNcDTfTgPJn5LsfLUlba_Tdzmhmd4L4b0tmqUnH3BM";
         return switch (tokenType) {
             case NONE -> null;
             case INVALID -> invalidToken;
