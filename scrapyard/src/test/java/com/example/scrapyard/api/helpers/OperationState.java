@@ -1,4 +1,4 @@
-package com.example.scrapyard.api;
+package com.example.scrapyard.api.helpers;
 
 public enum OperationState {
     NOT_FOUND,

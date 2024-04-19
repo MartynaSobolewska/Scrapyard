@@ -2,6 +2,8 @@ package com.example.scrapyard.api;
 
 import com.example.scrapyard.api.exceptions.BrandExistsException;
 import com.example.scrapyard.api.exceptions.BrandNotFoundException;
+import com.example.scrapyard.api.helpers.OperationState;
+import com.example.scrapyard.api.helpers.TokenType;
 import com.example.scrapyard.auth.JwtGenerator;
 import com.example.scrapyard.domain.BrandDTO;
 import com.example.scrapyard.model.*;
@@ -136,7 +138,7 @@ class BrandControllerTest {
         if (operationState == OperationState.NOT_FOUND){
             doThrow(BrandNotFoundException.createWith(id)).when(service).deleteBrandById(UUID.fromString(id));
         }
-        ResultActions resultActions = mockMvc.perform(
+        mockMvc.perform(
                         get("/brand/" + id)
                                 .header("Authorization", "Bearer " + getToken(tokenType))
                                 .header("guid", UUID.randomUUID())
