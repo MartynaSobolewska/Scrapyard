@@ -1,8 +1,8 @@
 package com.example.scrapyard.api;
 
-import com.example.scrapyard.api.exceptions.AuthenticationException;
 import com.example.scrapyard.api.exceptions.BrandNotFoundException;
 import com.example.scrapyard.api.exceptions.CarNotFoundException;
+import com.example.scrapyard.api.exceptions.CustomAuthException;
 import com.example.scrapyard.domain.CarDTO;
 import com.example.scrapyard.domain.CarResponse;
 import com.example.scrapyard.model.Car;
@@ -42,7 +42,7 @@ public class CarController {
     @PostMapping("")
     public ResponseEntity<URI> addNewCar(
             @Valid @RequestBody CarDTO carDTO,
-            @RequestHeader("Authorization") String token) throws AuthenticationException, BrandNotFoundException {
+            @RequestHeader("Authorization") String token) throws CustomAuthException, BrandNotFoundException {
         URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").
                 buildAndExpand(carService.saveCar(carDTO, token).getId()).toUri();
         return ResponseEntity.created(location).build();

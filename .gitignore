@@ -11,3 +11,4 @@ scrapyard-config-server/target
 *.iws
 *.iml
 *.ipr
+*.db
