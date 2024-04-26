@@ -1,5 +1,24 @@
 version: '3.8'
 services:
+  gateway:
+    build: ./gateway
+    ports:
+      - "8081:8081"
+    depends_on:
+      scrapyard:
+        condition: service_started
+      scrapyard-config-server:
+        condition: service_started
+      scrapyard-service-discovery:
+        condition: service_started
+    environment:
+      server.port: 8081
+      CONFIG-URL: scrapyard-config-server
+      config.port: 8888
+      SERVICE-DISCOVERY-URL: scrapyard-service-discovery
+      service-discovery.port: 8761
+      scrapyard.port: 8080
+      SCRAPYARD-URL: scrapyard
   scrapyard:
     build: ./scrapyard
     ports:
