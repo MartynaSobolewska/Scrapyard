@@ -1,11 +1,11 @@
 docker compose down
-cd scrapyard
+cd scrapyard || exit
 mvn clean install
-cd ../scrapyard-config-server
+cd ../scrapyard-config-server || exit
 mvn clean install
-cd ../scrapyard-service-discovery
+cd ../scrapyard-service-discovery || exit
 mvn clean install
-cd ../gateway
+cd ../gateway || exit
 mvn clean install
 cd ..
 docker compose up

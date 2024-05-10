@@ -10,8 +10,8 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@ToString
 public class CarDTO {
-    private UUID id;
     @NotEmpty
     @Size(min = 2, message = "should have at least 2 characters.")
     private String model;
