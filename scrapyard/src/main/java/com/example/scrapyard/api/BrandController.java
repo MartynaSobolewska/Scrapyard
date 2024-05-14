@@ -84,7 +84,7 @@ public class BrandController {
 
     })
     @DeleteMapping(path = "{id}")
-    public ResponseEntity<?> deleteBrandById(@PathVariable("id")
+    public ResponseEntity deleteBrandById(@PathVariable("id")
                                           @Parameter(name = "id",
                                                   description = "Brand uuid",
                                                   example = "dc84f2ca-5f63-46ec-8c62-7f59fbab5db7") UUID brandId)

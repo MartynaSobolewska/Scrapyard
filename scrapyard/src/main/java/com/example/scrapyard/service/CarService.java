@@ -1,7 +1,7 @@
 package com.example.scrapyard.service;
 
-import com.example.scrapyard.api.exceptions.AuthenticationException;
 import com.example.scrapyard.api.exceptions.BrandNotFoundException;
+import com.example.scrapyard.api.exceptions.CustomAuthException;
 import com.example.scrapyard.domain.CarDTO;
 import com.example.scrapyard.model.Car;
 
@@ -11,7 +11,7 @@ import java.util.UUID;
 
 public interface CarService {
     // C
-    Car saveCar(CarDTO car, String authToken) throws AuthenticationException, BrandNotFoundException;
+    Car saveCar(CarDTO car, String authToken) throws CustomAuthException, BrandNotFoundException;
 
     // R
     Optional<Car> getCarById(UUID id);

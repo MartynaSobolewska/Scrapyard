@@ -3,9 +3,6 @@ package com.example.scrapyard.api;
 import com.example.scrapyard.auth.JwtGenerator;
 import com.example.scrapyard.service.CustomUserDetailsServiceImpl;
 import com.google.gson.Gson;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -29,6 +26,7 @@ class AuthControllerTest {
 
     @MockBean
     private CustomUserDetailsServiceImpl userService;
+
 
 
 }

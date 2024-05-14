@@ -35,6 +35,8 @@ public class SecurityConfig {
                         .requestMatchers(antMatcher("/actuator/**")).permitAll()
                         .requestMatchers(antMatcher("/swagger-ui/**")).permitAll()
                         .requestMatchers(antMatcher("/api-docs/**")).permitAll()
+                        .requestMatchers(antMatcher("/autoconfig/**")).permitAll()
+                        .requestMatchers((antMatcher(HttpMethod.GET, "/car/sum"))).hasAnyAuthority("ADMIN")
                         .requestMatchers((antMatcher(HttpMethod.GET,"/car/**"))).hasAnyAuthority("USER")
                         .requestMatchers((antMatcher(HttpMethod.POST,"/car/**"))).hasAnyAuthority("USER")
                         .requestMatchers((antMatcher(HttpMethod.PUT,"/car/**"))).hasAnyAuthority("USER")
