@@ -37,14 +37,21 @@ public class AuthController {
 
     @PostMapping("login")
     public ResponseEntity<AuthResponseDTO> login(@RequestBody LoginDTO loginDTO) {
-        Authentication auth = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        loginDTO.getUsername(),
-                        loginDTO.getPassword(),
-                        userService.loadUserByUsername(loginDTO.getUsername()).getAuthorities()));
+//        Authentication auth = authenticationManager.authenticate(
+//                new UsernamePasswordAuthenticationToken(
+//                        loginDTO.getUsername(),
+//                        loginDTO.getPassword(),
+//                        userService.loadUserByUsername(loginDTO.getUsername()).getAuthorities()));
 
-        SecurityContextHolder.getContext().setAuthentication(auth);
-        String token = jwtGenerator.generateToken(auth);
+//        SecurityContextHolder.getContext().setAuthentication(auth);
+        String token = jwtGenerator.generateBearerToken(loginDTO.getUsername());
         return ResponseEntity.ok(new AuthResponseDTO(token));
     }
+
+//    @PostMapping("jwt")
+//    public ResponseEntity<AuthResponseDTO> getJwt(@RequestHeader String BearerToken) {
+//        SecurityContextHolder.getContext().setAuthentication(auth);
+//        String token = jwtGenerator.generateBearerToken(auth);
+//        return ResponseEntity.ok(new AuthResponseDTO(token));
+//    }
 }

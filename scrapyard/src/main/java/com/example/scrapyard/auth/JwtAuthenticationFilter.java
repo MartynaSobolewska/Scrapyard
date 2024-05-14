@@ -32,7 +32,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                                     @NonNull FilterChain filterChain) {
         String token = getJwtFromRequest(request);
         try {
-            if (StringUtils.hasText(token) && jwtGenerator.tokenIsValid(token)) {
+            if (StringUtils.hasText(token) && jwtGenerator.jwtTokenIsValid(token)) {
                 String username = jwtGenerator.getUsernameFromJwt(token);
                 List<SimpleGrantedAuthority> authorities =
                         jwtGenerator.getAuthoritiesFromJwt(token).stream()
