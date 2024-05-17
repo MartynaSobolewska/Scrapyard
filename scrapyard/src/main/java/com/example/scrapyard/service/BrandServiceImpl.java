@@ -22,7 +22,7 @@ public class BrandServiceImpl implements BrandService{
     @Override
     public Brand addBrand(BrandDTO brandDTO) throws BrandExistsException {
         if (brandRepository.findByName(brandDTO.getName()).isEmpty()){
-mi            return brandRepository.save(Brand.builder().name(brandDTO.getName()).build());
+            return brandRepository.save(Brand.builder().name(brandDTO.getName()).build());
         }else {
             throw BrandExistsException.createWith(brandDTO.getName());
         }

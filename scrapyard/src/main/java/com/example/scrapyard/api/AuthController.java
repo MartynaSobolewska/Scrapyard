@@ -44,7 +44,7 @@ public class AuthController {
 //                        userService.loadUserByUsername(loginDTO.getUsername()).getAuthorities()));
 
 //        SecurityContextHolder.getContext().setAuthentication(auth);
-        String token = jwtGenerator.generateBearerToken(loginDTO.getUsername());
+        String token = jwtGenerator.generateClientToken(loginDTO.getUsername());
         return ResponseEntity.ok(new AuthResponseDTO(token));
     }
 

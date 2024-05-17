@@ -39,7 +39,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                                     @NonNull FilterChain filterChain) throws ServletException, IOException, AuthenticationException {
         String token = getJwtFromRequest(request);
         try {
-            if (StringUtils.hasText(token) && jwtGenerator.jwtTokenIsValid(token)) {
+            if (StringUtils.hasText(token) && jwtGenerator.serverTokenIsValid(token)) {
                 String username = jwtGenerator.getUsernameFromJwt(token);
                 List<SimpleGrantedAuthority> authorities =
                         jwtGenerator.getAuthoritiesFromJwt(token).stream()
@@ -49,6 +49,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                         new UsernamePasswordAuthenticationToken(userDetails, userDetails.getAuthorities(), userDetails.getAuthorities());
                 authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+            }else {
+                throw CustomAuthException.createWith("JWT was incorrect");
             }
         } catch (CustomAuthException e) {
             String responseBody = gson.toJson(

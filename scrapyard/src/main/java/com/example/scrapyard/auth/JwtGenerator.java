@@ -1,10 +1,11 @@
 package com.example.scrapyard.auth;
 
 import com.example.scrapyard.api.exceptions.CustomAuthException;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
 
@@ -13,7 +14,7 @@ import java.util.*;
 @Component
 public class JwtGenerator {
     //TODO: move jwt secret to config service
-    public String generateBearerToken(String username){
+    public String generateClientToken(String username){
         // check if there is a bearer token for the username in the db. If expired, overwrite with a new one,
         // blank out the corresponding jwt.
         Date currentDate = new Date();
@@ -26,21 +27,21 @@ public class JwtGenerator {
                 .signWith(SignatureAlgorithm.HS512, SecurityConstants.BEARER_SECRET)
                 .compact();
     }
-//    public String generateJwtToken(String bearerToken){
-//        // check if bearer token is in the db. If expired, throw an error
-//
-//        Date currentDate = new Date();
-//        Date expireDate = new Date(currentDate.getTime() + SecurityConstants.JWT_EXPIRATION);
+    public String generateServerToken(String username){
+        // check if bearer token is in the db. If expired, throw an error
+
+        Date currentDate = new Date();
+        Date expireDate = new Date(currentDate.getTime() + SecurityConstants.JWT_EXPIRATION);
 //        String[] authorities = userService.loadUserByUsername(getUsernameFromJwt(bearerToken)).getAuthorities();
-//
-//        return Jwts.builder()
-//                .setSubject(username)
-//                .setIssuedAt(currentDate)
-//                .setExpiration(expireDate)
+
+        return Jwts.builder()
+                .setSubject(username)
+                .setIssuedAt(currentDate)
+                .setExpiration(expireDate)
 //                .claim("authorities", authorities)
-//                .signWith(SignatureAlgorithm.HS512, SecurityConstants.JWT_SECRET)
-//                .compact();
-//    }
+                .signWith(SignatureAlgorithm.HS512, SecurityConstants.JWT_SECRET)
+                .compact();
+    }
 
     public String createTestToken(String username){
         return createTestToken(username, false);
@@ -85,21 +86,24 @@ public class JwtGenerator {
                 .get("authorities");
     }
 
-    public boolean tokenIsValid(String token) throws CustomAuthException {
+    public boolean clientTokenIsValid(String token) throws CustomAuthException {
+        try {
+            Jws<Claims> claimsJws = Jwts.parser().setSigningKey(SecurityConstants.BEARER_SECRET).parseClaimsJws(token);
+            // validate token information
+            return claimsJws.getBody().getExpiration().after(new Date()) &&
+                    claimsJws.getBody().getIssuedAt() != null &&
+                    !claimsJws.getBody().getSubject().isEmpty();
+        }catch (Exception ex){
+            return false;
+        }
+    }
+
+    public boolean serverTokenIsValid(String token) throws AuthenticationException {
         try {
             Jwts.parser().setSigningKey(SecurityConstants.JWT_SECRET).parseClaimsJws(token);
             return true;
         }catch (Exception ex){
-            throw CustomAuthException.createWith("JWT was expired or incorrect");
-        }
-    }
-
-    public boolean bearerTokenIsValid(String token) throws AuthenticationException {
-        try {
-            Jwts.parser().setSigningKey(SecurityConstants.BEARER_SECRET).parseClaimsJws(token);
-            return true;
-        }catch (Exception ex){
-            throw new AuthenticationException("JWT was expired or incorrect");
+            throw new CustomAuthException("JWT was expired or incorrect");
         }
     }
 }
