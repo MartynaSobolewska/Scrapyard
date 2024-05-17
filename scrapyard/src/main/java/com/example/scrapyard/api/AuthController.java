@@ -1,5 +1,6 @@
 package com.example.scrapyard.api;
 
+import com.example.scrapyard.api.exceptions.CustomInternalServerError;
 import com.example.scrapyard.api.exceptions.UsernameExistsException;
 import com.example.scrapyard.auth.JwtGenerator;
 import com.example.scrapyard.domain.AuthResponseDTO;
@@ -36,7 +37,7 @@ public class AuthController {
     }
 
     @PostMapping("login")
-    public ResponseEntity<AuthResponseDTO> login(@RequestBody LoginDTO loginDTO) {
+    public ResponseEntity<AuthResponseDTO> login(@RequestBody LoginDTO loginDTO) throws CustomInternalServerError {
 //        Authentication auth = authenticationManager.authenticate(
 //                new UsernamePasswordAuthenticationToken(
 //                        loginDTO.getUsername(),

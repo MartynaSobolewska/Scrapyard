@@ -1,6 +1,7 @@
 package com.example.scrapyard.auth;
 
 import com.example.scrapyard.api.exceptions.CustomAuthException;
+import com.example.scrapyard.api.exceptions.CustomInternalServerError;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
@@ -14,7 +15,10 @@ import java.util.*;
 @Component
 public class JwtGenerator {
     //TODO: move jwt secret to config service
-    public String generateClientToken(String username){
+    public String generateClientToken(String username) throws CustomInternalServerError {
+        if (username == null || username.trim().isEmpty()){
+            throw CustomInternalServerError.createWith("Incorrect username data encountered when generating client token.");
+        }
         // check if there is a bearer token for the username in the db. If expired, overwrite with a new one,
         // blank out the corresponding jwt.
         Date currentDate = new Date();

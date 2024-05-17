@@ -1,7 +1,6 @@
 package com.example.scrapyard.auth;
 
-import com.example.scrapyard.api.exceptions.CustomAuthException;
-import com.example.scrapyard.repository.UserRepository;
+import com.example.scrapyard.api.exceptions.CustomInternalServerError;
 import com.example.scrapyard.service.CustomUserDetailsServiceImpl;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -12,13 +11,11 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.security.core.Authentication;
 import org.springframework.test.context.TestPropertySource;
 
 import java.util.Date;
 
 import static org.junit.Assert.*;
-import static org.mockito.BDDMockito.given;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
 @TestPropertySource(locations = "classpath:application-test.properties")
@@ -126,7 +123,7 @@ class JwtGeneratorTest {
     @DisplayName("client token builder tests")
     class RegisterTests{
         @Test
-        void givenUsernameReturnsToken() {
+        void givenUsernameReturnsToken() throws CustomInternalServerError {
             // Arrange
             String username = "test";
 
@@ -137,7 +134,30 @@ class JwtGeneratorTest {
             Assertions.assertNotNull(clientToken);
             Assertions.assertTrue(jwtGenerator.clientTokenIsValid(clientToken));
         }
+        @Test
+        void givenNullUsernameThrowsError(){
+            // Arrange
+            String username = null;
 
+            // Act & Assert
+            assertThrows(CustomInternalServerError.class, () -> jwtGenerator.generateClientToken(username));
+        }
+        @Test
+        void givenEmptyUsernameThrowsError(){
+            // Arrange
+            String username = "";
+
+            // Act & Assert
+            assertThrows(CustomInternalServerError.class, () -> jwtGenerator.generateClientToken(username));
+        }
+        @Test
+        void givenWhiteSpaceUsernameThrowsError(){
+            // Arrange
+            String username = " \n";
+
+            // Act & Assert
+            assertThrows(CustomInternalServerError.class, () -> jwtGenerator.generateClientToken(username));
+        }
     }
 
 }

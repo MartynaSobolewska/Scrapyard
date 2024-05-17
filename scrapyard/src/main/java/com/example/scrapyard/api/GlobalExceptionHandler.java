@@ -41,7 +41,10 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         if (ex instanceof CarNotFoundException rnfe) {
             HttpStatus status = HttpStatus.NOT_FOUND;
             return handleRegularException(rnfe, headers, status, request);
-        }else if (ex instanceof BrandNotFoundException bnfe) {
+        } else if (ex instanceof CustomInternalServerError cise) {
+            HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
+            return handleRegularException(cise, headers, status, request);
+        } else if (ex instanceof BrandNotFoundException bnfe) {
             HttpStatus status = HttpStatus.NOT_FOUND;
             return handleRegularException(bnfe, headers, status, request);
         } else if (ex instanceof BrandExistsException bee) {
@@ -53,9 +56,6 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         }else if (ex instanceof AuthenticationException authe){
             HttpStatus status = HttpStatus.FORBIDDEN;
             return handleRegularException(authe, headers, status, request);
-        }else if (ex instanceof CustomAuthException cauthe){
-            HttpStatus status = HttpStatus.FORBIDDEN;
-            return handleRegularException(cauthe, headers, status, request);
         }else if (ex instanceof DatabaseException dbe){
             HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
             return handleRegularException(dbe, headers, status, request);
