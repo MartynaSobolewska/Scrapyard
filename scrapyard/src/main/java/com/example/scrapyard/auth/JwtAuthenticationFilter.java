@@ -2,6 +2,7 @@ package com.example.scrapyard.auth;
 
 import com.example.scrapyard.api.exceptions.ApiError;
 import com.example.scrapyard.api.exceptions.CustomAuthException;
+import com.example.scrapyard.api.exceptions.CustomInternalServerError;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -42,7 +43,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             if (StringUtils.hasText(token) && jwtGenerator.serverTokenIsValid(token)) {
                 String username = jwtGenerator.getUsernameFromJwt(token);
                 List<SimpleGrantedAuthority> authorities =
-                        jwtGenerator.getAuthoritiesFromJwt(token).stream()
+                        jwtGenerator.getAuthoritiesFromServerToken(token).stream()
                         .map(SimpleGrantedAuthority::new).toList();
                 UserDetails userDetails = new User(username, "password", authorities);
                 UsernamePasswordAuthenticationToken authenticationToken =
