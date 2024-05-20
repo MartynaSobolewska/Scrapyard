@@ -32,6 +32,7 @@ class JwtGeneratorTest {
 
     private final String[] authorities = new String[]{"USER"};
 
+    // Moved to the clienttokenhelper in the auth service
     @Nested
     @DisplayName("client token validator tests")
     class ClientValidatorTests{
