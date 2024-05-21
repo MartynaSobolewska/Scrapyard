@@ -42,8 +42,8 @@ public class CustomUserDetailsServiceImpl implements CustomUserDetailsService {
             Optional<Role> presentRole = roleRepository.findByName("USER");
             if (presentRole.isEmpty()){
                 roleRepository.save(Role.builder().name("USER").build());
+                presentRole = roleRepository.findByName("USER");
             }
-            presentRole = roleRepository.findByName("USER");
             Role userRole = presentRole.get();
 
             UserEntity newUserEntity = UserEntity.builder()
@@ -51,6 +51,7 @@ public class CustomUserDetailsServiceImpl implements CustomUserDetailsService {
                     .passwordHash(passwordEncoder.encode(accountDto.getPassword()))
                     .roles(Collections.singletonList(userRole))
                     .build();
+
             return userRepository.save(newUserEntity);
         }
         throw UsernameExistsException.createWith(accountDto.getUsername());

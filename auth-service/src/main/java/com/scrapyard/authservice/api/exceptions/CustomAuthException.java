@@ -15,8 +15,8 @@ public class CustomAuthException extends AuthenticationException {
         message = msg;
     }
 
-    public static com.example.scrapyard.api.exceptions.CustomAuthException createWith(String message) {
-        return new com.example.scrapyard.api.exceptions.CustomAuthException(message);
+    public static CustomAuthException createWith(String message) {
+        return new CustomAuthException(message);
     }
 
     @Override
