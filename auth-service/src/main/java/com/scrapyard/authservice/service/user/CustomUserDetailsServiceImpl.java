@@ -5,6 +5,7 @@ import com.scrapyard.authservice.DAOs.UserRepository;
 import com.scrapyard.authservice.DAOs.models.Role;
 import com.scrapyard.authservice.DAOs.models.UserEntity;
 import com.scrapyard.authservice.api.DTOs.RegisterDTO;
+import com.scrapyard.authservice.api.exceptions.UsernameExistsException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
