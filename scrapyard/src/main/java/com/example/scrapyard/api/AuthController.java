@@ -19,40 +19,40 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/auth")
 public class AuthController {
-    private final CustomUserDetailsServiceImpl userService;
-    private final AuthenticationManager authenticationManager;
-
-    private final JwtGenerator jwtGenerator;
-
-    public AuthController(CustomUserDetailsServiceImpl userService, AuthenticationManager authenticationManager, JwtGenerator jwtGenerator) {
-        this.userService = userService;
-        this.authenticationManager = authenticationManager;
-        this.jwtGenerator = jwtGenerator;
-    }
-
-    @PostMapping("register")
-    public ResponseEntity<String> register(@RequestBody RegisterDTO registerDTO) throws UsernameExistsException {
-        userService.registerNewUserAccount(registerDTO);
-        return ResponseEntity.ok("Account created.");
-    }
-
-    @PostMapping("login")
-    public ResponseEntity<AuthResponseDTO> login(@RequestBody LoginDTO loginDTO) throws CustomInternalServerError {
-//        Authentication auth = authenticationManager.authenticate(
-//                new UsernamePasswordAuthenticationToken(
-//                        loginDTO.getUsername(),
-//                        loginDTO.getPassword(),
-//                        userService.loadUserByUsername(loginDTO.getUsername()).getAuthorities()));
-
-//        SecurityContextHolder.getContext().setAuthentication(auth);
-        String token = jwtGenerator.generateClientToken(loginDTO.getUsername());
-        return ResponseEntity.ok(new AuthResponseDTO(token));
-    }
-
-//    @PostMapping("jwt")
-//    public ResponseEntity<AuthResponseDTO> getJwt(@RequestHeader String BearerToken) {
-//        SecurityContextHolder.getContext().setAuthentication(auth);
-//        String token = jwtGenerator.generateBearerToken(auth);
+//    private final CustomUserDetailsServiceImpl userService;
+//    private final AuthenticationManager authenticationManager;
+//
+//    private final JwtGenerator jwtGenerator;
+//
+//    public AuthController(CustomUserDetailsServiceImpl userService, AuthenticationManager authenticationManager, JwtGenerator jwtGenerator) {
+//        this.userService = userService;
+//        this.authenticationManager = authenticationManager;
+//        this.jwtGenerator = jwtGenerator;
+//    }
+//
+//    @PostMapping("register")
+//    public ResponseEntity<String> register(@RequestBody RegisterDTO registerDTO) throws UsernameExistsException {
+//        userService.registerNewUserAccount(registerDTO);
+//        return ResponseEntity.ok("Account created.");
+//    }
+//
+//    @PostMapping("login")
+//    public ResponseEntity<AuthResponseDTO> login(@RequestBody LoginDTO loginDTO) throws CustomInternalServerError {
+////        Authentication auth = authenticationManager.authenticate(
+////                new UsernamePasswordAuthenticationToken(
+////                        loginDTO.getUsername(),
+////                        loginDTO.getPassword(),
+////                        userService.loadUserByUsername(loginDTO.getUsername()).getAuthorities()));
+//
+////        SecurityContextHolder.getContext().setAuthentication(auth);
+//        String token = jwtGenerator.generateClientToken(loginDTO.getUsername());
 //        return ResponseEntity.ok(new AuthResponseDTO(token));
 //    }
+//
+////    @PostMapping("jwt")
+////    public ResponseEntity<AuthResponseDTO> getJwt(@RequestHeader String BearerToken) {
+////        SecurityContextHolder.getContext().setAuthentication(auth);
+////        String token = jwtGenerator.generateBearerToken(auth);
+////        return ResponseEntity.ok(new AuthResponseDTO(token));
+////    }
 }

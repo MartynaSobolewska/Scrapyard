@@ -15,36 +15,6 @@ import java.util.*;
 @Component
 public class JwtGenerator {
     //TODO: move jwt secret to config service
-    public String generateClientToken(String username) throws CustomInternalServerError {
-        if (username == null || username.trim().isEmpty()){
-            throw CustomInternalServerError.createWith("Incorrect username data encountered when generating client token.");
-        }
-        Date currentDate = new Date();
-        Date expireDate = new Date(currentDate.getTime() + SecurityConstants.JWT_EXPIRATION);
-
-        return Jwts.builder()
-                .setSubject(username)
-                .setIssuedAt(currentDate)
-                .setExpiration(expireDate)
-                .signWith(SignatureAlgorithm.HS512, SecurityConstants.CLIENT_TOKEN_SECRET)
-                .compact();
-    }
-    public String generateServerToken(String username, String[] authorities) throws CustomInternalServerError {
-        boolean authoritiesCorrect = authorities == null || Arrays.stream(authorities).anyMatch(a -> a==null || a.isEmpty());
-        if (username == null || username.trim().isEmpty() || authoritiesCorrect){
-            throw CustomInternalServerError.createWith("Incorrect username data encountered when generating client token.");
-        }
-        Date currentDate = new Date();
-        Date expireDate = new Date(currentDate.getTime() + SecurityConstants.JWT_EXPIRATION);
-
-        return Jwts.builder()
-                .setSubject(username)
-                .setIssuedAt(currentDate)
-                .setExpiration(expireDate)
-                .claim("authorities", authorities)
-                .signWith(SignatureAlgorithm.HS512, SecurityConstants.SERVER_TOKEN_SECRET)
-                .compact();
-    }
 
     public String createTestToken(String username){
         return createTestToken(username, false);

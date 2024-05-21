@@ -24,7 +24,6 @@ class ClientTokenHelperTest {
     private final Date currentDate = new Date();
     private final Date pastDate = new Date(currentDate.getTime() - SecurityConstants.JWT_EXPIRATION);
     private final Date expireDate = new Date(currentDate.getTime() + SecurityConstants.JWT_EXPIRATION);
-    private final String[] authorities = new String[]{"USER"};
 
     @Nested
     @DisplayName("client token validator tests")

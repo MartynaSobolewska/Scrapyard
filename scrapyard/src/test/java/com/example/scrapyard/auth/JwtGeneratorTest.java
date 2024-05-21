@@ -122,6 +122,7 @@ class JwtGeneratorTest {
         }
     }
 
+    // Moved to the clienttokenhelper in the auth service
     @Nested
     @DisplayName("client token builder tests")
     class ClientTokenBuilderTests{
