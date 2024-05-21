@@ -1,4 +1,4 @@
-package com.scrapyard.authservice.service;
+package com.scrapyard.authservice.service.auth;
 
 import com.scrapyard.authservice.api.exceptions.CustomInternalServerError;
 import com.scrapyard.authservice.config.SecurityConstants;

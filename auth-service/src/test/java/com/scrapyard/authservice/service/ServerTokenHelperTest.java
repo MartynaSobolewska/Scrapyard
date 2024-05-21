@@ -2,6 +2,7 @@ package com.scrapyard.authservice.service;
 
 import com.scrapyard.authservice.api.exceptions.CustomInternalServerError;
 import com.scrapyard.authservice.config.SecurityConstants;
+import com.scrapyard.authservice.service.auth.ServerTokenHelper;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.junit.jupiter.api.Assertions;
@@ -10,7 +11,6 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.TestPropertySource;
 
 import java.util.Date;

@@ -1,11 +1,9 @@
 package com.scrapyard.authservice.api;
 
 import com.scrapyard.authservice.api.DTOs.LoginDTO;
-import com.scrapyard.authservice.api.DTOs.LoginResponseDTO;
 import com.scrapyard.authservice.api.exceptions.CustomInternalServerError;
-import com.scrapyard.authservice.service.TokenService;
+import com.scrapyard.authservice.service.auth.TokenService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,8 +23,9 @@ public class AuthController {
     }
 
     @PostMapping("login")
-    public ResponseEntity<LoginResponseDTO> login(@RequestBody LoginDTO loginDTO) throws CustomInternalServerError {
+    public ResponseEntity login(@RequestBody LoginDTO loginDTO) throws CustomInternalServerError {
 //        String token = jwtGenerator.generateClientToken(loginDTO.getUsername());
 //        return ResponseEntity.ok(new AuthResponseDTO(token));
+        return ResponseEntity.ok().build();
     }
 }

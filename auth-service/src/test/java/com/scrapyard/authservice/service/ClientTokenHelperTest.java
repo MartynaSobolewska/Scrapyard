@@ -2,6 +2,7 @@ package com.scrapyard.authservice.service;
 
 import com.scrapyard.authservice.api.exceptions.CustomInternalServerError;
 import com.scrapyard.authservice.config.SecurityConstants;
+import com.scrapyard.authservice.service.auth.ClientTokenHelper;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.junit.jupiter.api.Assertions;
