@@ -41,8 +41,7 @@ public class CustomUserDetailsServiceImpl implements CustomUserDetailsService {
         if (userRepository.findByUsername(accountDto.getUsername()).isEmpty()){
             Optional<Role> presentRole = roleRepository.findByName("USER");
             if (presentRole.isEmpty()){
-                roleRepository.save(Role.builder().name("USER").build());
-                presentRole = roleRepository.findByName("USER");
+                presentRole = Optional.of(roleRepository.save(Role.builder().name("USER").build()));
             }
             Role userRole = presentRole.get();
 

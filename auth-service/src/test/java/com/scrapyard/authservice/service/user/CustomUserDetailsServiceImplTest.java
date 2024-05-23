@@ -7,6 +7,8 @@ import com.scrapyard.authservice.DAOs.models.UserEntity;
 import com.scrapyard.authservice.api.DTOs.RegisterDTO;
 import com.scrapyard.authservice.api.exceptions.DatabaseException;
 import com.scrapyard.authservice.api.exceptions.UsernameExistsException;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -34,6 +36,7 @@ class CustomUserDetailsServiceImplTest {
 
     @Mock PasswordEncoder passwordEncoder;
     @Captor ArgumentCaptor<UserEntity> userEntityCaptor;
+    @Captor ArgumentCaptor<Role> roleArgumentCaptor;
 
     @InjectMocks CustomUserDetailsServiceImpl userDetailsService;
 
@@ -43,9 +46,10 @@ class CustomUserDetailsServiceImplTest {
 
 
     @Nested
+    @DisplayName("Register user tests")
     class RegisterUserTest {
         @Test
-        void testRegisterNewUser() throws UsernameExistsException, DatabaseException {
+        void givenValidDtoSaveToDb() throws UsernameExistsException {
             // Arrange
             when(roleRepository.findByName("USER")).thenReturn(Optional.of(userRole));
             when(userRepository.findByUsername("test_username")).thenReturn(Optional.empty());
@@ -62,7 +66,39 @@ class CustomUserDetailsServiceImplTest {
             assertEquals(encodedTestPassword, capturedUser.getPasswordHash());
             assertEquals(userRole.getName(), capturedUser.getRoles().get(0).getName());
         }
+
+        @Test
+        void givenExistingUsernameThrowError(){
+            // Arrange
+            when(userRepository.findByUsername("test_username")).thenReturn(Optional.of(UserEntity.builder().build()));
+
+            // Act & Assert
+            assertThrows(UsernameExistsException.class, () -> userDetailsService.registerNewUserAccount(validRegisterDto));
+        }
+
+        @Test
+        void givenUserRoleDoesntExistCreateIt() throws UsernameExistsException {
+            // Arrange
+            when(roleRepository.findByName("USER")).thenReturn(Optional.empty());
+            when(roleRepository.save(any(Role.class))).thenReturn(userRole);
+            when(userRepository.findByUsername("test_username")).thenReturn(Optional.empty());
+            when(passwordEncoder.encode("test_password")).thenReturn(encodedTestPassword);
+
+            // Act
+            userDetailsService.registerNewUserAccount(validRegisterDto);
+
+            // Assert that user role was created
+            verify(roleRepository, times(1)).save(any(Role.class));
+            verify(roleRepository, times(1)).findByName("USER");
+            verify(roleRepository).save(roleArgumentCaptor.capture());
+            assertEquals(roleArgumentCaptor.getValue().getName(), userRole.getName());
+
+            // Assert saved user is correct
+            verify(userRepository).save(userEntityCaptor.capture());
+            UserEntity capturedUser = userEntityCaptor.getValue();
+            assertEquals(validRegisterDto.getUsername(), capturedUser.getUsername());
+            assertEquals(encodedTestPassword, capturedUser.getPasswordHash());
+            assertEquals(userRole.getName(), capturedUser.getRoles().get(0).getName());
+        }
     }
-
-
 }
