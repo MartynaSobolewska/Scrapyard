@@ -40,4 +40,12 @@ public class ClientTokenHelper {
             return false;
         }
     }
+
+    public static String getUsername(String token){
+        return Jwts.parser()
+                .setSigningKey(SecurityConstants.CLIENT_TOKEN_SECRET)
+                .parseClaimsJws(token)
+                .getBody()
+                .getSubject();
+    }
 }
