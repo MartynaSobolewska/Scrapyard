@@ -12,7 +12,7 @@ import java.util.Date;
 
 @Component
 public class ClientTokenHelper {
-    public String generateToken(String username) throws CustomInternalServerError {
+    public static String generateToken(String username) throws CustomInternalServerError {
         if (username == null || username.trim().isEmpty()){
             throw CustomInternalServerError.createWith("Incorrect username data encountered when generating client token.");
         }
@@ -27,7 +27,7 @@ public class ClientTokenHelper {
                 .compact();
     }
 
-    public boolean validateToken(String token) {
+    public static boolean isValid(String token) {
         try {
             Jws<Claims> claimsJws = Jwts.parser().setSigningKey(SecurityConstants.CLIENT_TOKEN_SECRET).parseClaimsJws(token);
             Date now = new Date();

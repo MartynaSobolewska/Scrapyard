@@ -31,7 +31,7 @@ public class ServerTokenHelper {
                 .compact();
     }
 
-    public boolean validateToken(String token){
+    public static boolean isValid(String token){
         try {
             Jws<Claims> claimsJws = Jwts.parser().setSigningKey(SecurityConstants.SERVER_TOKEN_SECRET).parseClaimsJws(token);
             ArrayList<String> authorities = (ArrayList<String>) claimsJws.getBody().get("authorities");

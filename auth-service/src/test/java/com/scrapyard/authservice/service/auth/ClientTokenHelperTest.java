@@ -2,7 +2,6 @@ package com.scrapyard.authservice.service.auth;
 
 import com.scrapyard.authservice.api.exceptions.CustomInternalServerError;
 import com.scrapyard.authservice.config.SecurityConstants;
-import com.scrapyard.authservice.service.auth.ClientTokenHelper;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.junit.jupiter.api.Assertions;
@@ -20,8 +19,6 @@ import static org.junit.jupiter.api.Assertions.*;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
 @TestPropertySource(locations = "classpath:application-test.properties")
 class ClientTokenHelperTest {
-    @Autowired
-    private ClientTokenHelper clientTokenHelper;
     private final Date currentDate = new Date();
     private final Date pastDate = new Date(currentDate.getTime() - SecurityConstants.JWT_EXPIRATION);
     private final Date expireDate = new Date(currentDate.getTime() + SecurityConstants.JWT_EXPIRATION);
@@ -38,7 +35,7 @@ class ClientTokenHelperTest {
                     .signWith(SignatureAlgorithm.HS512, SecurityConstants.CLIENT_TOKEN_SECRET)
                     .compact();
 
-            boolean correct = clientTokenHelper.validateToken(clientToken);
+            boolean correct = ClientTokenHelper.isValid(clientToken);
             Assertions.assertTrue(correct);
         }
 
@@ -50,7 +47,7 @@ class ClientTokenHelperTest {
                     .signWith(SignatureAlgorithm.HS512, SecurityConstants.CLIENT_TOKEN_SECRET)
                     .compact();
 
-            boolean correct = clientTokenHelper.validateToken(clientToken);
+            boolean correct = ClientTokenHelper.isValid(clientToken);
             Assertions.assertFalse(correct);
         }
 
@@ -62,7 +59,7 @@ class ClientTokenHelperTest {
                     .signWith(SignatureAlgorithm.HS512, SecurityConstants.CLIENT_TOKEN_SECRET)
                     .compact();
 
-            boolean correct = clientTokenHelper.validateToken(clientToken);
+            boolean correct = ClientTokenHelper.isValid(clientToken);
             Assertions.assertFalse(correct);
         }
 
@@ -74,7 +71,7 @@ class ClientTokenHelperTest {
                     .signWith(SignatureAlgorithm.HS512, SecurityConstants.CLIENT_TOKEN_SECRET)
                     .compact();
 
-            boolean correct = clientTokenHelper.validateToken(clientToken);
+            boolean correct = ClientTokenHelper.isValid(clientToken);
             Assertions.assertFalse(correct);
         }
 
@@ -86,7 +83,7 @@ class ClientTokenHelperTest {
                     .signWith(SignatureAlgorithm.HS512, SecurityConstants.CLIENT_TOKEN_SECRET)
                     .compact();
 
-            boolean correct = clientTokenHelper.validateToken(clientToken);
+            boolean correct = ClientTokenHelper.isValid(clientToken);
             Assertions.assertFalse(correct);
         }
 
@@ -98,7 +95,7 @@ class ClientTokenHelperTest {
                     .signWith(SignatureAlgorithm.HS512, "SECRET")
                     .compact();
 
-            boolean correct = clientTokenHelper.validateToken(clientToken);
+            boolean correct = ClientTokenHelper.isValid(clientToken);
             Assertions.assertFalse(correct);
         }
 
@@ -110,7 +107,7 @@ class ClientTokenHelperTest {
                     .signWith(SignatureAlgorithm.HS256, SecurityConstants.CLIENT_TOKEN_SECRET)
                     .compact();
 
-            boolean correct = clientTokenHelper.validateToken(clientToken);
+            boolean correct = ClientTokenHelper.isValid(clientToken);
             Assertions.assertFalse(correct);
         }
     }
@@ -124,11 +121,11 @@ class ClientTokenHelperTest {
             String username = "test";
 
             // Act
-            String clientToken = clientTokenHelper.generateToken(username);
+            String clientToken = ClientTokenHelper.generateToken(username);
 
             // Assert
             Assertions.assertNotNull(clientToken);
-            Assertions.assertTrue(clientTokenHelper.validateToken(clientToken));
+            Assertions.assertTrue(ClientTokenHelper.isValid(clientToken));
         }
         @Test
         void givenNullUsernameThrowsError(){
@@ -136,7 +133,7 @@ class ClientTokenHelperTest {
             String username = null;
 
             // Act & Assert
-            assertThrows(CustomInternalServerError.class, () -> clientTokenHelper.generateToken(username));
+            assertThrows(CustomInternalServerError.class, () -> ClientTokenHelper.generateToken(username));
         }
         @Test
         void givenEmptyUsernameThrowsError(){
@@ -144,7 +141,7 @@ class ClientTokenHelperTest {
             String username = "";
 
             // Act & Assert
-            assertThrows(CustomInternalServerError.class, () -> clientTokenHelper.generateToken(username));
+            assertThrows(CustomInternalServerError.class, () -> ClientTokenHelper.generateToken(username));
         }
         @Test
         void givenWhiteSpaceUsernameThrowsError(){
@@ -152,7 +149,7 @@ class ClientTokenHelperTest {
             String username = " \n";
 
             // Act & Assert
-            assertThrows(CustomInternalServerError.class, () -> clientTokenHelper.generateToken(username));
+            assertThrows(CustomInternalServerError.class, () -> ClientTokenHelper.generateToken(username));
         }
     }
 

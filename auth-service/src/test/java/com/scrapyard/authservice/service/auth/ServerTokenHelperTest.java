@@ -2,7 +2,6 @@ package com.scrapyard.authservice.service.auth;
 
 import com.scrapyard.authservice.api.exceptions.CustomInternalServerError;
 import com.scrapyard.authservice.config.SecurityConstants;
-import com.scrapyard.authservice.service.auth.ServerTokenHelper;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.junit.jupiter.api.Assertions;
@@ -41,7 +40,7 @@ class ServerTokenHelperTest {
                     .signWith(SignatureAlgorithm.HS512, SecurityConstants.SERVER_TOKEN_SECRET)
                     .compact();
 
-            boolean correct = serverTokenHelper.validateToken(serverToken);
+            boolean correct = serverTokenHelper.isValid(serverToken);
             Assertions.assertTrue(correct);
         }
         @Test
@@ -53,7 +52,7 @@ class ServerTokenHelperTest {
                     .signWith(SignatureAlgorithm.HS512, SecurityConstants.SERVER_TOKEN_SECRET)
                     .compact();
 
-            boolean correct = serverTokenHelper.validateToken(serverToken);
+            boolean correct = serverTokenHelper.isValid(serverToken);
             Assertions.assertFalse(correct);
         }
         @Test
@@ -65,7 +64,7 @@ class ServerTokenHelperTest {
                     .signWith(SignatureAlgorithm.HS512, SecurityConstants.SERVER_TOKEN_SECRET)
                     .compact();
 
-            boolean correct = serverTokenHelper.validateToken(serverToken);
+            boolean correct = serverTokenHelper.isValid(serverToken);
             Assertions.assertFalse(correct);
         }
         @Test
@@ -77,7 +76,7 @@ class ServerTokenHelperTest {
                     .signWith(SignatureAlgorithm.HS512, SecurityConstants.SERVER_TOKEN_SECRET)
                     .compact();
 
-            boolean correct = serverTokenHelper.validateToken(serverToken);
+            boolean correct = serverTokenHelper.isValid(serverToken);
             Assertions.assertFalse(correct);
         }
 
@@ -91,7 +90,7 @@ class ServerTokenHelperTest {
                     .signWith(SignatureAlgorithm.HS512, SecurityConstants.SERVER_TOKEN_SECRET)
                     .compact();
 
-            boolean correct = serverTokenHelper.validateToken(serverToken);
+            boolean correct = serverTokenHelper.isValid(serverToken);
             Assertions.assertFalse(correct);
         }
 
@@ -105,7 +104,7 @@ class ServerTokenHelperTest {
                     .signWith(SignatureAlgorithm.HS512, SecurityConstants.SERVER_TOKEN_SECRET)
                     .compact();
 
-            boolean correct = serverTokenHelper.validateToken(serverToken);
+            boolean correct = serverTokenHelper.isValid(serverToken);
             Assertions.assertFalse(correct);
         }
     }
@@ -123,7 +122,7 @@ class ServerTokenHelperTest {
 
             // Assert
             Assertions.assertNotNull(serverToken);
-            Assertions.assertTrue(serverTokenHelper.validateToken(serverToken));
+            Assertions.assertTrue(serverTokenHelper.isValid(serverToken));
         }
         @Test
         void givenNullUsernameBuildsThrowsError(){
