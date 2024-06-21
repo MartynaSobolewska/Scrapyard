@@ -2,12 +2,11 @@ package com.scrapyard.authservice.api.exceptions;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.security.core.AuthenticationException;
 
 
 @Getter
 @Setter
-public class CustomAuthException extends AuthenticationException {
+public class CustomAuthException extends Throwable {
     private final String message;
 
     public CustomAuthException(String msg) {
