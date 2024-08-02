@@ -1,12 +1,17 @@
 package com.scrapyard.authservice.service.auth;
 
 import com.scrapyard.authservice.DAOs.models.Role;
+import com.scrapyard.authservice.DAOs.models.TokenPair;
 import com.scrapyard.authservice.DAOs.models.UserEntity;
+import com.scrapyard.authservice.api.DTOs.LoginDTO;
 import com.scrapyard.authservice.api.DTOs.RegisterDTO;
+import com.scrapyard.authservice.api.exceptions.CustomAuthException;
 import com.scrapyard.authservice.api.exceptions.CustomInternalServerError;
 import com.scrapyard.authservice.api.exceptions.UsernameExistsException;
 import com.scrapyard.authservice.service.user.CustomUserDetailsServiceImpl;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 @Service
 public class AuthOpsService {
@@ -29,5 +34,13 @@ public class AuthOpsService {
         String serverToken = ServerTokenHelper.generateToken(user.getUsername(), roles);
         tokenService.saveTokenPair(bearerToken, serverToken);
         return bearerToken;
+    }
+
+    public String login(LoginDTO loginDTO) throws CustomAuthException, CustomInternalServerError {
+        Optional<TokenPair> optionalTokenPair = tokenService.getTokenPairByBearerToken(loginDTO.getBearerToken());
+        if (optionalTokenPair.isEmpty()) {
+            throw CustomAuthException.createWith("No such bearer token exists in the database.");
+        }
+        return optionalTokenPair.get().getServerToken();
     }
 }

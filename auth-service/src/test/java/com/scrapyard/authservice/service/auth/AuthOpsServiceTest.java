@@ -3,7 +3,9 @@ package com.scrapyard.authservice.service.auth;
 import com.scrapyard.authservice.DAOs.models.Role;
 import com.scrapyard.authservice.DAOs.models.TokenPair;
 import com.scrapyard.authservice.DAOs.models.UserEntity;
+import com.scrapyard.authservice.api.DTOs.LoginDTO;
 import com.scrapyard.authservice.api.DTOs.RegisterDTO;
+import com.scrapyard.authservice.api.exceptions.CustomAuthException;
 import com.scrapyard.authservice.api.exceptions.CustomInternalServerError;
 import com.scrapyard.authservice.api.exceptions.UsernameExistsException;
 import com.scrapyard.authservice.service.user.CustomUserDetailsServiceImpl;
@@ -16,6 +18,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -27,8 +30,6 @@ import static org.mockito.Mockito.*;
 class AuthOpsServiceTest {
     @Mock TokenService tokenService;
     @Mock CustomUserDetailsServiceImpl userDetailsService;
-    @Mock ClientTokenHelper clientTokenHelper;
-    @Mock ServerTokenHelper serverTokenHelper;
 
     @InjectMocks
     AuthOpsService authOpsService;
@@ -90,5 +91,24 @@ class AuthOpsServiceTest {
             verify(tokenService, times(1)).saveTokenPair(anyString(), anyString());
         }
 
+    }
+
+    @Nested
+    @DisplayName("Login tests")
+    class LoginTests {
+        @Test
+        void givenExistingBearerTokenReturnServerToken() throws CustomInternalServerError, CustomAuthException {
+            LoginDTO bearerTokenOfExistingUser = LoginDTO.builder().bearerToken("bearer_token_of_existing_user").build();
+            TokenPair tokenPair = TokenPair.builder().bearerToken(bearerTokenOfExistingUser.getBearerToken()).serverToken("serverToken").build();
+            when(tokenService.getTokenPairByBearerToken(bearerTokenOfExistingUser.getBearerToken())).thenReturn(Optional.of(tokenPair));
+            String serverToken = authOpsService.login(bearerTokenOfExistingUser);
+            assertEquals(serverToken, tokenPair.getServerToken());
+        }
+        @Test
+        void givenBearerTokenThatsNotInAdbThrow500() throws CustomInternalServerError {
+            LoginDTO bearerTokenOfNonexistentUser = LoginDTO.builder().bearerToken("bearer_token_of_existing_user").build();
+            when(tokenService.getTokenPairByBearerToken(bearerTokenOfNonexistentUser.getBearerToken())).thenReturn(Optional.empty());
+            assertThrows(CustomAuthException.class, () -> authOpsService.login(bearerTokenOfNonexistentUser));
+        }
     }
 }

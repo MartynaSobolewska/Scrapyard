@@ -6,7 +6,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class CustomAuthException extends Throwable {
+public class CustomAuthException extends Exception {
     private final String message;
 
     public CustomAuthException(String msg) {

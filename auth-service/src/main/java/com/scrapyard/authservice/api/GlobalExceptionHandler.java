@@ -1,6 +1,7 @@
-package com.scrapyard.authservice.api.DTOs;
+package com.scrapyard.authservice.api;
 
 import com.scrapyard.authservice.api.exceptions.ApiError;
+import com.scrapyard.authservice.api.exceptions.CustomAuthException;
 import com.scrapyard.authservice.api.exceptions.UsernameExistsException;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
@@ -26,7 +27,8 @@ import java.util.List;
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler({
-            UsernameExistsException.class
+            UsernameExistsException.class,
+            CustomAuthException.class
             })
     @Nullable
     public final ResponseEntity<ApiError> handleCustomException(Exception ex, WebRequest request) {
@@ -34,6 +36,9 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
         if (ex instanceof UsernameExistsException) {
             HttpStatus status = HttpStatus.CONFLICT;
+            return handleRegularException(ex, headers, status, request);
+        }else if (ex instanceof CustomAuthException) {
+            HttpStatus status = HttpStatus.UNAUTHORIZED;
             return handleRegularException(ex, headers, status, request);
         } else {
             HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;

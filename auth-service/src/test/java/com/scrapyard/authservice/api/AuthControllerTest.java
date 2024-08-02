@@ -1,7 +1,9 @@
 package com.scrapyard.authservice.api;
 
 import com.google.gson.Gson;
+import com.scrapyard.authservice.api.DTOs.LoginDTO;
 import com.scrapyard.authservice.api.DTOs.RegisterDTO;
+import com.scrapyard.authservice.api.exceptions.CustomAuthException;
 import com.scrapyard.authservice.api.exceptions.UsernameExistsException;
 import com.scrapyard.authservice.service.auth.AuthOpsService;
 import com.scrapyard.authservice.service.auth.TokenService;
@@ -61,6 +63,42 @@ class AuthControllerTest {
                     .andExpect(status().isConflict())
                     .andExpect(jsonPath("$.errors").exists())
                     .andExpect(jsonPath("$.errors.[0]").value("User with username \"test_username\" already exists"));
+        }
+    }
+
+    @Nested
+    @DisplayName("Login tests")
+    class LoginTests {
+        LoginDTO loginDTO = LoginDTO.builder().bearerToken("correct_token").build();
+
+        @Test
+        void givenNullLoginDTOThrowError() throws Exception {
+            mockMvc.perform(post("/auth/login")).andExpect(status().isBadRequest());
+        }
+
+        @Test
+        void givenValidLoginDTOReturn200() throws Exception {
+            when(authOpsService.login(loginDTO)).thenReturn("test_token");
+            mockMvc.perform(post("/auth/login")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(gson.toJson(loginDTO))
+                            .characterEncoding("utf-8")
+                    )
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.token").value("test_token"));
+        }
+
+        @Test
+        void givenUsernameExistsThrow401() throws Exception {
+            when(authOpsService.login(loginDTO)).thenThrow(CustomAuthException.createWith("No such bearer token exists in the database."));
+            mockMvc.perform(post("/auth/login")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(gson.toJson(loginDTO))
+                            .characterEncoding("utf-8")
+                    )
+                    .andExpect(status().isUnauthorized())
+                    .andExpect(jsonPath("$.errors").exists())
+                    .andExpect(jsonPath("$.errors.[0]").value("Authentication unsuccessful: No such bearer token exists in the database."));
         }
     }
 }

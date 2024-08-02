@@ -7,6 +7,6 @@ import lombok.*;
 @NoArgsConstructor
 @Getter
 @Setter
-public class RegisterResponse {
+public class AuthResponse {
     String token;
 }
