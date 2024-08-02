@@ -2,6 +2,7 @@ package com.scrapyard.authservice.api;
 
 import com.google.gson.Gson;
 import com.scrapyard.authservice.api.DTOs.RegisterDTO;
+import com.scrapyard.authservice.api.exceptions.UsernameExistsException;
 import com.scrapyard.authservice.service.auth.AuthOpsService;
 import com.scrapyard.authservice.service.auth.TokenService;
 import org.junit.jupiter.api.*;
@@ -27,13 +28,7 @@ class AuthControllerTest {
     @MockBean TokenService tokenService;
     @Autowired
     private MockMvc mockMvc;
-    Gson gson;
-
-    @BeforeEach
-    void setup() {
-        System.out.println("setup");
-        gson = new Gson();
-    }
+    Gson gson = new Gson();
 
     @Nested
     @DisplayName("Register tests")
@@ -54,6 +49,18 @@ class AuthControllerTest {
                     )
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.token").value("test_token"));
+        }
+        @Test
+        void givenUsernameExistsThrow409() throws Exception {
+            when(authOpsService.register(registerDTO)).thenThrow(UsernameExistsException.createWith("test_username"));
+            mockMvc.perform(post("/auth/register")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(gson.toJson(registerDTO))
+                            .characterEncoding("utf-8")
+                    )
+                    .andExpect(status().isConflict())
+                    .andExpect(jsonPath("$.errors").exists())
+                    .andExpect(jsonPath("$.errors.[0]").value("User with username \"test_username\" already exists"));
         }
     }
 }

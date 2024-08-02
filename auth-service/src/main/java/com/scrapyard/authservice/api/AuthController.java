@@ -30,7 +30,7 @@ public class AuthController {
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping(path = "register", produces = "application/json")
+    @RequestMapping(value = "register", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     public ResponseEntity<RegisterResponse> register(@RequestBody RegisterDTO registerDTO) throws CustomInternalServerError, UsernameExistsException {
         String token = authOpsService.register(registerDTO);
