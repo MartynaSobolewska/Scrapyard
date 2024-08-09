@@ -1,7 +1,7 @@
 package com.scrapyard.gateway;
 
 import com.netflix.discovery.EurekaClient;
-import com.scrapyard.gateway.domain.CarDTO;
+import com.scrapyard.gateway.filters.AuthFilter;
 import com.scrapyard.gateway.filters.RequestFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
@@ -24,14 +24,20 @@ public class GatewayApplication {
 	@Autowired
 	RequestFilter requestFilter;
 
+	@Autowired
+	AuthFilter authFilter;
+
 	@Bean
 	public RouteLocator customRouteLocator(RouteLocatorBuilder builder) {
 		// adding 2 rotes to first microservice as we need to log request body if method is POST
 		return builder.routes()
-				.route("scrapyard",r -> r.path("/car")
+				.route("GetBearerToken", r -> r.path("/auth/register")
 						.and().method("POST")
-						.and().readBody(CarDTO.class, s -> true).filters(f -> f.filters(requestFilter))
-						.uri("http://localhost:8081"))
+						.uri("http://localhost:8083"))
+				.route("GetScrapyardCars", r -> r.path("/car")
+						.and().method("GET")
+						.filters(f -> f.filters(authFilter))
+						.uri("http://localhost:8080/car"))
 				.build();
 	}
 
