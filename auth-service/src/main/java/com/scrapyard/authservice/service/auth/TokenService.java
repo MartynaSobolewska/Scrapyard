@@ -10,9 +10,13 @@ import java.util.Optional;
 @Service
 public class TokenService {
     final TokenRepository tokenRepository;
+    final ClientTokenHelper clientTokenHelper;
+    final ServerTokenHelper serverTokenHelper;
 
     public TokenService(TokenRepository tokenRepository, ClientTokenHelper clientTokenHelper, ServerTokenHelper serverTokenHelper) {
         this.tokenRepository = tokenRepository;
+        this.clientTokenHelper = clientTokenHelper;
+        this.serverTokenHelper = serverTokenHelper;
     }
 
     public TokenPair saveTokenPair(String bearerToken, String serverToken) throws CustomInternalServerError {
@@ -20,10 +24,10 @@ public class TokenService {
             serverToken == null || serverToken.trim().isEmpty()) {
             throw CustomInternalServerError.createWith("Incorrect bearerToken data encountered when saving token pair.");
         }
-        if (!ClientTokenHelper.isValid(bearerToken)) {
+        if (!clientTokenHelper.isValid(bearerToken)) {
             throw CustomInternalServerError.createWith("Invalid bearer token data encountered when saving token pair.");
         }
-        if (!ServerTokenHelper.isValid(serverToken)) {
+        if (!serverTokenHelper.isValid(serverToken)) {
             throw CustomInternalServerError.createWith("Invalid server token data encountered when saving token pair.");
         }
         TokenPair tokenPair = TokenPair.builder().bearerToken(bearerToken).serverToken(serverToken).build();

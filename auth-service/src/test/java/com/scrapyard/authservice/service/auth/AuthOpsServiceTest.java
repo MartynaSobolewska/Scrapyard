@@ -31,12 +31,18 @@ class AuthOpsServiceTest {
     @Mock TokenService tokenService;
     @Mock CustomUserDetailsServiceImpl userDetailsService;
 
+    final ClientTokenHelper clientTokenHelper;
+
     @InjectMocks
     AuthOpsService authOpsService;
 
     RegisterDTO correctRegisterDTO = RegisterDTO.builder().username("test_username").password("test_password").build();
     List<Role> roles =  List.of(Role.builder().name("USER").id(UUID.randomUUID()).build());
     UserEntity user = UserEntity.builder().username("test_username").passwordHash("test_password_hash").roles(roles).build();
+
+    AuthOpsServiceTest(ClientTokenHelper clientTokenHelper) {
+        this.clientTokenHelper = clientTokenHelper;
+    }
 
 
     @Nested
@@ -86,8 +92,8 @@ class AuthOpsServiceTest {
 
             String bearerTokenResult = authOpsService.register(correctRegisterDTO);
 
-            assertTrue(ClientTokenHelper.isValid(bearerTokenResult));
-            assertEquals(ClientTokenHelper.getUsername(bearerTokenResult), user.getUsername());
+            assertTrue(clientTokenHelper.isValid(bearerTokenResult));
+            assertEquals(clientTokenHelper.getUsername(bearerTokenResult), user.getUsername());
             verify(tokenService, times(1)).saveTokenPair(anyString(), anyString());
         }
 

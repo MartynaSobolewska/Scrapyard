@@ -14,8 +14,6 @@ import java.util.*;
 
 @Component
 public class JwtGenerator {
-    //TODO: move jwt secret to config service
-
     public String createTestToken(String username){
         return createTestToken(username, false);
     }
@@ -44,33 +42,12 @@ public class JwtGenerator {
                 .getBody()
                 .getSubject();
     }
-    public String getUsernameFromBearerToken(String token){
-        return Jwts.parser()
-                .setSigningKey(SecurityConstants.CLIENT_TOKEN_SECRET)
-                .parseClaimsJws(token)
-                .getBody()
-                .getSubject();
-    }
     public ArrayList<String> getAuthoritiesFromServerToken(String token){
         return (ArrayList<String>) Jwts.parser()
                 .setSigningKey(SecurityConstants.SERVER_TOKEN_SECRET)
                 .parseClaimsJws(token)
                 .getBody()
                 .get("authorities");
-    }
-
-    public boolean clientTokenIsValid(String token) throws CustomAuthException {
-        try {
-            Jws<Claims> claimsJws = Jwts.parser().setSigningKey(SecurityConstants.CLIENT_TOKEN_SECRET).parseClaimsJws(token);
-            Date now = new Date();
-
-            // validate token information
-            return claimsJws.getBody().getExpiration().after(now) &&
-                    claimsJws.getBody().getIssuedAt().before(now) &&
-                    !claimsJws.getBody().getSubject().isEmpty();
-        }catch (Exception ex){
-            return false;
-        }
     }
 
     public boolean serverTokenIsValid(String token) throws AuthenticationException {

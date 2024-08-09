@@ -21,11 +21,17 @@ import static org.junit.jupiter.api.Assertions.*;
 class ServerTokenHelperTest {
     @Autowired
     private ServerTokenHelper serverTokenHelper;
+
+    final SecurityConstants securityConstants;
     private final Date currentDate = new Date();
     private final Date pastDate = new Date(currentDate.getTime() - SecurityConstants.JWT_EXPIRATION);
     private final Date expireDate = new Date(currentDate.getTime() + SecurityConstants.JWT_EXPIRATION);
 
     private final String[] authorities = new String[]{"USER"};
+
+    ServerTokenHelperTest(SecurityConstants securityConstants) {
+        this.securityConstants = securityConstants;
+    }
 
     @Nested
     @DisplayName("server token validator tests")
@@ -37,7 +43,7 @@ class ServerTokenHelperTest {
                     .setSubject("username")
                     .setIssuedAt(currentDate)
                     .setExpiration(expireDate)
-                    .signWith(SignatureAlgorithm.HS512, SecurityConstants.SERVER_TOKEN_SECRET)
+                    .signWith(SignatureAlgorithm.HS512, securityConstants.SERVER_TOKEN_SECRET)
                     .compact();
 
             boolean correct = serverTokenHelper.isValid(serverToken);
@@ -49,7 +55,7 @@ class ServerTokenHelperTest {
                     .setSubject("username")
                     .setIssuedAt(currentDate)
                     .setExpiration(expireDate)
-                    .signWith(SignatureAlgorithm.HS512, SecurityConstants.SERVER_TOKEN_SECRET)
+                    .signWith(SignatureAlgorithm.HS512, securityConstants.SERVER_TOKEN_SECRET)
                     .compact();
 
             boolean correct = serverTokenHelper.isValid(serverToken);
@@ -61,7 +67,7 @@ class ServerTokenHelperTest {
                     .claim("authorities", authorities)
                     .setSubject("username")
                     .setExpiration(expireDate)
-                    .signWith(SignatureAlgorithm.HS512, SecurityConstants.SERVER_TOKEN_SECRET)
+                    .signWith(SignatureAlgorithm.HS512, securityConstants.SERVER_TOKEN_SECRET)
                     .compact();
 
             boolean correct = serverTokenHelper.isValid(serverToken);
@@ -73,7 +79,7 @@ class ServerTokenHelperTest {
                     .claim("authorities", authorities)
                     .setSubject("username")
                     .setIssuedAt(currentDate)
-                    .signWith(SignatureAlgorithm.HS512, SecurityConstants.SERVER_TOKEN_SECRET)
+                    .signWith(SignatureAlgorithm.HS512, securityConstants.SERVER_TOKEN_SECRET)
                     .compact();
 
             boolean correct = serverTokenHelper.isValid(serverToken);
@@ -87,7 +93,7 @@ class ServerTokenHelperTest {
                     .setSubject("username")
                     .setExpiration(expireDate)
                     .setIssuedAt(expireDate)
-                    .signWith(SignatureAlgorithm.HS512, SecurityConstants.SERVER_TOKEN_SECRET)
+                    .signWith(SignatureAlgorithm.HS512, securityConstants.SERVER_TOKEN_SECRET)
                     .compact();
 
             boolean correct = serverTokenHelper.isValid(serverToken);
@@ -101,7 +107,7 @@ class ServerTokenHelperTest {
                     .setSubject("username")
                     .setExpiration(expireDate)
                     .setIssuedAt(expireDate)
-                    .signWith(SignatureAlgorithm.HS512, SecurityConstants.SERVER_TOKEN_SECRET)
+                    .signWith(SignatureAlgorithm.HS512, securityConstants.SERVER_TOKEN_SECRET)
                     .compact();
 
             boolean correct = serverTokenHelper.isValid(serverToken);

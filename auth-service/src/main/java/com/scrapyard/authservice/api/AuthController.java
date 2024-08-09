@@ -8,6 +8,7 @@ import com.scrapyard.authservice.api.exceptions.CustomInternalServerError;
 import com.scrapyard.authservice.api.exceptions.UsernameExistsException;
 import com.scrapyard.authservice.service.auth.AuthOpsService;
 import com.scrapyard.authservice.service.auth.TokenService;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,6 +17,9 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/auth")
 public class AuthController {
     private final AuthOpsService authOpsService;
+
+    @Value("${security.secrets.server:secret}")
+    String secret;
     private final TokenService tokenService;
 
     public AuthController(AuthOpsService authOpsService, TokenService tokenService) {
@@ -28,6 +32,7 @@ public class AuthController {
     // Server token is used internally - only by scrapyard microservices (inaccessible to the user)
     @PostMapping(path ="login", produces = "application/json")
     public ResponseEntity<AuthResponse> login(@RequestBody LoginDTO loginDTO) throws CustomAuthException, CustomInternalServerError {
+        System.out.println("secret: " + secret);
         String serverToken = authOpsService.login(loginDTO);
         AuthResponse loginResponse = AuthResponse.builder().token(serverToken).build();
         return ResponseEntity.ok(loginResponse);
@@ -38,6 +43,7 @@ public class AuthController {
     @RequestMapping(value = "register", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     public ResponseEntity<AuthResponse> register(@RequestBody RegisterDTO registerDTO) throws CustomInternalServerError, UsernameExistsException {
+        System.out.println("secret: " + secret);
         String token = authOpsService.register(registerDTO);
         AuthResponse registerResponse = AuthResponse.builder().token(token).build();
         return ResponseEntity.ok(registerResponse);

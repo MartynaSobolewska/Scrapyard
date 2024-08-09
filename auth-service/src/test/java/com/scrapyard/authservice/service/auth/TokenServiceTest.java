@@ -6,7 +6,6 @@ import com.scrapyard.authservice.api.exceptions.CustomInternalServerError;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -22,18 +21,24 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 @TestPropertySource(locations = "classpath:application-test.properties")
 class TokenServiceTest{
+    final AuthTestHelper authTestHelper;
     @Mock
     TokenRepository tokenRepository;
 
     String testUsername = "test_username";
-    String validBearerToken = AuthTestHelper.createTestBearerToken(testUsername);
-    String validServerToken = AuthTestHelper.createTestServerToken(testUsername);
+    String validBearerToken;
+    String validServerToken;
     ArgumentCaptor<TokenPair> tokenPairArgumentCaptor = ArgumentCaptor.forClass(TokenPair.class);
 
     @InjectMocks
     TokenService tokenService;
 
-    TokenServiceTest() throws CustomInternalServerError {}
+    TokenServiceTest(AuthTestHelper authTestHelper, TokenRepository tokenRepository) throws CustomInternalServerError {
+        this.authTestHelper = authTestHelper;
+        this.tokenRepository = tokenRepository;
+        validBearerToken = authTestHelper.createTestBearerToken(testUsername);
+        validServerToken = authTestHelper.createTestServerToken(testUsername);
+    }
 
     @Nested
     @DisplayName("Save token pair tests")

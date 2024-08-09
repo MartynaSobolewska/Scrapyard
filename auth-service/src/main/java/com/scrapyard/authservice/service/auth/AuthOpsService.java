@@ -15,12 +15,16 @@ import java.util.Optional;
 
 @Service
 public class AuthOpsService {
+    final ClientTokenHelper clientTokenHelper;
     final CustomUserDetailsServiceImpl userRepository;
     final TokenService tokenService;
+    final ServerTokenHelper serverTokenHelper;
 
-    public AuthOpsService(CustomUserDetailsServiceImpl userRepository, TokenService tokenService) {
+    public AuthOpsService(ClientTokenHelper clientTokenHelper, CustomUserDetailsServiceImpl userRepository, TokenService tokenService, ServerTokenHelper serverTokenHelper) {
+        this.clientTokenHelper = clientTokenHelper;
         this.userRepository = userRepository;
         this.tokenService = tokenService;
+        this.serverTokenHelper = serverTokenHelper;
     }
 
     public String register(RegisterDTO registerDTO) throws CustomInternalServerError, UsernameExistsException {
@@ -30,8 +34,8 @@ public class AuthOpsService {
         }
         UserEntity user = userRepository.registerNewUserAccount(registerDTO);
         String[] roles = user.getRoles().stream().map(Role::getName).toArray(String[]::new);
-        String bearerToken = ClientTokenHelper.generateToken(user.getUsername());
-        String serverToken = ServerTokenHelper.generateToken(user.getUsername(), roles);
+        String bearerToken = clientTokenHelper.generateToken(user.getUsername());
+        String serverToken = serverTokenHelper.generateToken(user.getUsername(), roles);
         tokenService.saveTokenPair(bearerToken, serverToken);
         return bearerToken;
     }
